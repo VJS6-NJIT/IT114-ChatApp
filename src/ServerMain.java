@@ -7,7 +7,7 @@ public class ServerMain {
         int port = 12345;
 
         try (ServerSocket serverSocket = new ServerSocket(port)) {
-            System.out.println("Server started. Waiting for Clients...")
+            System.out.println("Server started. Waiting for Clients...");
 
             while (true) {
                 Socket clientSocket = serverSocket.accept();
