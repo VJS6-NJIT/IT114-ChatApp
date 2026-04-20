@@ -7,18 +7,16 @@ public class ServerMain {
         int port = 12345;
 
         try (ServerSocket serverSocket = new ServerSocket(port)) {
-            System.out.println("Server started. Waiting for Clients...");
+            System.out.println("Re-AIM Server Started...");
 
             while (true) {
-                Socket clientSocket = serverSocket.accept();
-                System.out.println("Client Connected: " + clientSocket.getInetAddress());
-
-                ClientHandler clientHandler = new ClientHandler(clientSocket);
-                clientHandler.start();
+                Socket socket = serverSocket.accept();
+                ClientHandler client = new ClientHandler(socket);
+                client.start();
             }
 
         } catch (IOException e) {
-            System.out.println("Server error: " + e.getMessage());
+            System.out.println("Server Error");
         }
         
     }
