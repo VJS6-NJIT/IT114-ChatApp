@@ -1,3 +1,18 @@
 [gaming] Fred: /join gaming
 [gaming] Fred: This is gaming room.
 [gaming] Doug: /join gaming
+[gaming] Me: /join gaming
+[gaming] You: /join gaming
+[gaming] Me: /rps rock
+[gaming] You: /rps scissors
+[gaming] Tony: /join gaming
+[gaming] Pauly: /join gaming
+[gaming] Pauly: /rps scissors
+[gaming] Tony: /rps rock
+[gaming] Tony: /rps paper
+[gaming] Pauly: /rps rock
+[gaming] Soprano: /join gaming
+[gaming] Walnuts: /join gaming
+[gaming] Soprano: /rps scissors
+[gaming] Walnuts: /rps 
+[gaming] Walnuts: /rps paper

@@ -11,6 +11,7 @@ public class ClientHandler extends Thread {
     private String currentRoom = "Lobby";
 
     public static ArrayList<ClientHandler> clients = new ArrayList<>();
+    public static HashMap<String, String> roomMoves = new HashMap<>();
 
     public ClientHandler(Socket socket) {
         this.socket = socket;
@@ -80,8 +81,6 @@ public class ClientHandler extends Thread {
 
                     broadcastToRoom("SERVER: " + username + " joined the room.");
 
-                    loadChatHistory();
-
                     System.out.println(username + " moved from " +
                         oldRoom + " to " + currentRoom);
                     }
@@ -99,12 +98,21 @@ public class ClientHandler extends Thread {
                     handleDirectMessage(message);
                 }
 
+                // COMMAND: /rps
+                else if (message.startsWith("/rps ")) {
+
+                    handleRPS(message);
+                }
+
                 // NORMAL CHAT
-                String formattedMessage = "[" + currentRoom + "] " + username + ": " + message;
+                else {
 
-                broadcastToRoom(formattedMessage);
+                    String formattedMessage = "[" + currentRoom + "] " + username + ": " + message;
 
-                saveMessage(formattedMessage);
+                    broadcastToRoom(formattedMessage);
+
+                    saveMessage(formattedMessage);
+                }
             }
 
         } catch (IOException e) {
@@ -247,6 +255,75 @@ public class ClientHandler extends Thread {
         }
 
         out.println("User not found.");
+    }
+
+    // ROCK PAPER SCISSORS
+    public void handleRPS(String message) {
+
+        String[] parts = message.split(" ", 2);
+
+        if (parts.length < 2) {
+
+            out.println("Usage: /rps rock|paper|scissors");
+            return;
+        }
+
+        String move = parts[1].toLowerCase();
+
+        // VALIDATE MOVE
+        if (!move.equals("rock") &&
+            !move.equals("paper") &&
+            !move.equals("scissors")) {
+
+            out.println("Invalid move.");
+            return;
+        }
+
+            synchronized (roomMoves) {
+
+            // FIRST PLAYER
+            if (!roomMoves.containsKey(currentRoom)) {
+
+                roomMoves.put(currentRoom, move);
+
+                out.println("RPS move submitted. Waiting for opponent.");
+
+            }
+
+            // SECOND PLAYER
+            else {
+
+                String opponentMove = roomMoves.get(currentRoom);
+
+                String result = determineWinner(opponentMove, move);
+
+                broadcastToRoom("RPS Result in room [" + currentRoom + "]\n" + "Move 1: " + opponentMove + "\n" + "Move 2: " + move + "\n" + result);
+
+                roomMoves.remove(currentRoom);
+            }
+        }
+    }
+
+    // DETERMINE WINNER
+    public String determineWinner(String move1, String move2) {
+
+        if (move1.equals(move2)) {
+
+            return "Tie game!";
+        }
+
+        if (
+            (move1.equals("rock") && move2.equals("scissors")) ||
+
+                    (move1.equals("paper") && move2.equals("rock")) ||
+
+                    (move1.equals("scissors") && move2.equals("paper"))
+        ) {
+
+            return "First player wins!";
+        }
+
+        return "Second player wins!";
     }
 
     // CLEAN DISCONNECT
