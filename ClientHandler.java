@@ -64,6 +64,12 @@ public class ClientHandler extends Thread {
                     break;
                 }
 
+                // COMMAND: /dm
+                else if (message.startsWith("/dm ")) {
+
+                    handleDirectMessage(message);
+                }
+
                 // NORMAL CHAT
                 else {
                     broadcast(username + ": " + message);
@@ -126,6 +132,40 @@ public class ClientHandler extends Thread {
         }
 
         out.println(users.toString());
+    }
+
+    // DIRECT MESSAGE
+    public void handleDirectMessage(String message) {
+
+        String[] parts = message.split(" ", 3);
+
+        // VALIDATION
+        if (parts.length < 3) {
+            out.println("Usage: /dm username message");
+            return;
+        }
+
+        String targetUsername = parts[1];
+        String dmMessage = parts[2];
+
+        synchronized (clients) {
+
+            for (ClientHandler client : clients) {
+
+                if (client.username.equalsIgnoreCase(targetUsername)) {
+
+                    // SEND TO TARGET
+                    client.out.println("[DM from " + username + "]: " + dmMessage);
+
+                    // SEND BACK TO SENDER
+                    out.println("[DM to " + targetUsername + "]: " + dmMessage);
+
+                    return;
+                }
+            }
+        }
+
+        out.println("User not found.");
     }
 
     // CLEAN DISCONNECT
