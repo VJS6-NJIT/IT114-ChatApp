@@ -8,6 +8,7 @@ public class ClientHandler extends Thread {
     private BufferedReader in;
     private PrintWriter out;
     private String username;
+    private String currentRoom = "Lobby";
 
     public static ArrayList<ClientHandler> clients = new ArrayList<>();
 
@@ -47,7 +48,7 @@ public class ClientHandler extends Thread {
                 clients.add(this);
             }
 
-            broadcast("SERVER: " + username + " joined the chat.");
+            broadcastToRoom("SERVER: " + username + " joined the room.");
 
             String message;
 
@@ -56,6 +57,30 @@ public class ClientHandler extends Thread {
                 // COMMAND: /list
                 if (message.equalsIgnoreCase("/list")) {
                     sendUserList();
+                }
+
+                // COMMAND: /join
+                else if (message.startsWith("/join ")) {
+
+                String[] parts = message.split(" ", 2);
+
+                 if (parts.length < 2) {
+
+                      out.println("Usage: /join roomName");
+
+                } else {
+
+                    String oldRoom = currentRoom;
+
+                    currentRoom = parts[1];
+
+                    out.println("Joined room: " + currentRoom);
+
+                    broadcastToRoom("SERVER: " + username + " joined the room.");
+
+                    System.out.println(username + " moved from " +
+                        oldRoom + " to " + currentRoom);
+                    }
                 }
 
                 // COMMAND: /leave
@@ -72,7 +97,7 @@ public class ClientHandler extends Thread {
 
                 // NORMAL CHAT
                 else {
-                    broadcast(username + ": " + message);
+                    broadcastToRoom("[" + currentRoom + "] " + username + ": " + message);
                 }
             }
 
@@ -87,13 +112,17 @@ public class ClientHandler extends Thread {
         }
     }
 
-    // SEND TO ALL USERS
-    public void broadcast(String message) {
+    // ROOM-ONLY BROADCAST
+    public void broadcastToRoom(String message) {
 
         synchronized (clients) {
 
             for (ClientHandler client : clients) {
-                client.out.println(message);
+
+                if (client.currentRoom.equalsIgnoreCase(this.currentRoom)) {
+
+                    client.out.println(message);
+                }
             }
         }
     }
@@ -178,7 +207,7 @@ public class ClientHandler extends Thread {
             }
 
             if (username != null) {
-                broadcast("SERVER: " + username + " left the chat.");
+                broadcastToRoom("SERVER: " + username + " left the room.");
             }
 
             socket.close();
