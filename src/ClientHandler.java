@@ -61,7 +61,7 @@ public class ClientHandler extends Thread {
                 }
 
                 // COMMAND: /join
-                else if (message.startsWith("/join ")) {
+                else if (message.startsWith("/join")) {
 
                 String[] parts = message.split(" ", 2);
 
@@ -73,7 +73,17 @@ public class ClientHandler extends Thread {
 
                     String oldRoom = currentRoom;
 
-                    currentRoom = parts[1];
+                    String requestedRoom = parts[1];
+
+                // VALIDATE ROOM NAME
+                if (!requestedRoom.matches("[a-zA-Z0-9_]+")) {
+
+                    out.println("Invalid room name. Use letters, numbers, or underscores only.");
+
+                    continue;
+                }
+
+                currentRoom = requestedRoom;
 
                     out.println("Joined room: " + currentRoom);
 
@@ -93,19 +103,25 @@ public class ClientHandler extends Thread {
                 }
 
                 // COMMAND: /dm
-                else if (message.startsWith("/dm ")) {
+                else if (message.startsWith("/dm")) {
 
                     handleDirectMessage(message);
                 }
 
                 // COMMAND: /rps
-                else if (message.startsWith("/rps ")) {
+                else if (message.startsWith("/rps")) {
 
                     handleRPS(message);
                 }
 
                 // NORMAL CHAT
                 else {
+
+                     // PREVENT EMPTY MESSAGES
+                    if (message.trim().isEmpty()) {
+                        out.println("Cannot send empty message.");
+                        continue;
+                    }
 
                     String formattedMessage = "[" + currentRoom + "] " + username + ": " + message;
 
@@ -205,22 +221,28 @@ public class ClientHandler extends Thread {
         return false;
     }
 
-    // SEND ACTIVE USERS
     public void sendUserList() {
 
         StringBuilder users = new StringBuilder();
 
-        users.append("Active users: ");
+        users.append("Room: ")
+             .append(currentRoom)
+             .append("\nUsers: ");
 
         synchronized (clients) {
 
             for (ClientHandler client : clients) {
 
-                users.append(client.username).append(" ");
+                // ONLY SHOW USERS IN SAME ROOM
+                if (client.currentRoom.equalsIgnoreCase(currentRoom)) {
+
+                    users.append(client.username)
+                         .append(" ");
+                }
             }
         }
 
-        out.println(users.toString());
+    out.println(users.toString());
     }
 
     // DIRECT MESSAGE

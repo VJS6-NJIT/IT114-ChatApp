@@ -1,2 +1,9 @@
 [Lobby] Donny: Hello I am person.
 [Lobby] You: /joing gaming
+[Lobby] Al: /dm
+[Lobby] Al: /dm
+[Lobby] aaa: /dm
+[Lobby] aaa: /join
+[Lobby] aaa: 
+[Lobby] aaa: 
+[Lobby] aaa: /list 
