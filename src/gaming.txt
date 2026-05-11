@@ -1,0 +1,3 @@
+[gaming] Fred: /join gaming
+[gaming] Fred: This is gaming room.
+[gaming] Doug: /join gaming
